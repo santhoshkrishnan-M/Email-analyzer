@@ -1,1 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Subject Line Analyzer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(120deg, #6a11cb, #2575fc);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      color: #2575fc;
+      margin-bottom: 10px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      resize: none;
+    }
+
+    button {
+      background: #6a11cb;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #2575fc;
+    }
+
+    .output {
+      text-align: left;
+      margin-top: 25px;
+    }
+
+    .score {
+      font-weight: bold;
+      color: #6a11cb;
+    }
+
+    .flag {
+      color: #d9534f;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Subject Line Analyzer</h1>
+    <p>Enter email subject lines (separated by commas):</p>
+    <textarea id="inputText" rows="5" placeholder="e.g., Get your free trial now, Win money fast"></textarea>
+    <button onclick="analyzeSubjects()">Analyze</button>
+
+    <div class="output" id="output"></div>
+  </div>
+
+  <script>
+    const powerWords = ["free", "exclusive", "limited", "now", "easy", "new", "proven"];
+    const spamWords = ["guaranteed", "money", "click here", "buy now", "100%", "win"];
+    const actionVerbs = ["get", "discover", "boost", "start", "grow", "unlock", "learn"];
+    const emotionalWords = ["amazing", "best", "secret", "exciting", "limited", "incredible"];
+
+    function analyzeSubject(subject) {
+      const words = subject.toLowerCase().split(" ");
+      let score = 0;
+      let flags = [];
+
+      if (words.length >= 6 && words.length <= 10) {
+        score += 2;
+      } else {
+        flags.push("⚠️ Subject length not ideal");
+      }
+
+      if (words.some(word => powerWords.includes(word))) {
+        score += 2;
+      } else {
+        flags.push("⚠️ No power words used");
+      }
+
+      if (!words.some(word => spamWords.includes(word))) {
+        score += 2;
+      } else {
+        flags.push("🚫 Contains spammy words");
+      }
+
+      if (actionVerbs.includes(words[0])) {
+        score += 2;
+      } else {
+        flags.push("⚠️ No strong action verb at the beginning");
+      }
+
+      if (words.some(word => emotionalWords.includes(word))) {
+        score += 2;
+      } else {
+        flags.push("⚠️ Could use more emotional/engaging words");
+      }
+
+      return { score, flags };
+    }
+
+    function analyzeSubjects() {
+      const input = document.getElementById("inputText").value;
+      const subjects = input.split(",").map(s => s.trim());
+      const outputDiv = document.getElementById("output");
+      outputDiv.innerHTML = "";
+
+      subjects.forEach(subject => {
+        const { score, flags } = analyzeSubject(subject);
+        const result = `<div><strong>Subject:</strong> "${subject}"<br><span class='score'>Score: ${score}/10</span>`;
+        let flagHTML = "";
+        flags.forEach(flag => {
+          flagHTML += `<div class='flag'>${flag}</div>`;
+        });
+        outputDiv.innerHTML += result + flagHTML + "<hr></div>";
+      });
+    }
+  </script>
+</body>
+</html>
 
